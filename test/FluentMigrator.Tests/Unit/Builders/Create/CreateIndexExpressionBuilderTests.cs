@@ -217,6 +217,29 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.Index);
 
             Assert.AreEqual("someColumn = 'test'", additionalFeatures[PostgresExtensions.IndexFilter]);
+        }
+
+        [Test]
+        public void CallingTablespaceExpressingInPostgres()
+        {
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [PostgresExtensions.IndexTablespace] = ""
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().Tablespace("indexspace");
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual("indexspace", additionalFeatures[PostgresExtensions.IndexFilter]);
 
 
         }

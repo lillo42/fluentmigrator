@@ -257,6 +257,17 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " NULLS LAST";
         }
 
+        protected virtual string GetTablespace(CreateIndexExpression expression)
+        {
+            var tablespace = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexTablespace);
+            if (!string.IsNullOrWhiteSpace(tablespace))
+            {
+                return " TABLESPACE " + tablespace;
+            }
+
+            return string.Empty;
+        }
+
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
@@ -307,6 +318,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             result.Append(")")
                 .Append(GetIncludeString(expression))
+                .Append(GetTablespace(expression))
                 .Append(GetFilter(expression))
                 .Append(";");
 

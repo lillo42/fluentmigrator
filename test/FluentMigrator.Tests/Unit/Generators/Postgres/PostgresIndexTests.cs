@@ -157,6 +157,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WHERE \"TestColumn1\" > 100;");
         }
 
+        [Test]
+        public void CanCreateIndexWithTablespace()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexTablespace, () => "indexspace");
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) TABLESPACE indexspace;");
+        }
+
         protected static CreateIndexExpression GetCreateIndexWithExpression(Action<CreateIndexExpression> additionalFeature)
         {
             var expression = new CreateIndexExpression
