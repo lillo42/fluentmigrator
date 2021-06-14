@@ -25,19 +25,24 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleQuoterBase : GenericQuoter
     {
-        // http://www.dba-oracle.com/t_ora_01704_string_literal_too_long.htm
-        public const int MaxChunkLength = 3900;
+        // ORA-01704 - Max length is 4_000 bytes
+        // 4000 bytes = 3601 https://medium.com/@datacheesehead/4000-bytes-is-not-4000-characters-1dfaef1b1543
+        public const int MaxChunkLength = 3601;
 
         public static readonly char[] EscapeCharacters = new[] { '\'', '\t', '\r', '\n' };
 
         public static IEnumerable<string> SplitBy(string str, int maxChunkLength)
         {
             if (string.IsNullOrEmpty(str))
+            {
                 throw new ArgumentNullException(nameof(str));
+            }
 
             // Having escape characters the chunk length less than 2 does not make a sense.
             if (maxChunkLength < 2)
+            {
                 throw new ArgumentException($"'{nameof(maxChunkLength)}' must be greater than 1.");
+            }
 
             var chunk = new StringBuilder();
             var chunkLength = 0;
